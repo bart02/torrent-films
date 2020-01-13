@@ -1,4 +1,5 @@
 from provider import Provider
+from torrent import Torrents
 
 rutracker = Provider(domain='https://rutracker.org/forum/',
                      auth={
@@ -16,10 +17,38 @@ rutracker = Provider(domain='https://rutracker.org/forum/',
                                    'end': -1},
                          'rows': '#tor-tbl > tbody > tr',
                          'name': 'td.t-title a',
-                         'size': 'td.tor-size',
+                         'size': {'selector': 'td.tor-size',
+                                  'attribute': 'data-ts_text',
+                                  'num': 0},
                          'link': 'td.tor-size a',
+                         'magnet': None,
                          'seeds': '.seedmed',
                          'leeches': '.leechmed'
                      })
 
-found = rutracker.search('поймай меня если сможешь 2002')
+rutor = Provider(domain='http://rutor.info/',
+                 search={
+                     'request': {'url_template': 'search/0/0/300/2/{}'},
+                     'pages': {'selector': '.bottom_info .pg',
+                               'start': 0,
+                               'end': -1},
+                     'rows': '#index .gai, #index .tum',
+                     'name': 'a[href*=torrent]',
+                     'size': {'selector': 'td[align=right]',
+                              'attribute': None,
+                              'num': -1},
+                     'link': 'a.downgif',
+                     'magnet': 'a[href*=magnet]',
+                     'seeds': '.green',
+                     'leeches': '.red'
+                 })
+
+query = 'тайны следствия'
+
+found = []
+found += rutracker.search(query)
+found += rutor.search(query)
+
+tor = Torrents(found)
+
+print()

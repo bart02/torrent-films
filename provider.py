@@ -44,16 +44,24 @@ class Provider:
             response = BeautifulSoup(response.text, "html.parser")
             rows += response.select(self.search_params['rows'])
 
-        torrents = Torrents()
+        torrents = []
         for row in rows:
             try:
                 name = row.select_one(self.search_params['name']).text
-                size = row.select_one(self.search_params['size'])['data-ts_text']
+                if self.search_params['size']['attribute'] is not None:
+                    size = row.select(self.search_params['size']['selector'])[self.search_params['size']['num']][self.search_params['size']['attribute']]
+                else:
+                    size = row.select(self.search_params['size']['selector'])[self.search_params['size']['num']].text
                 link = row.select_one(self.search_params['link'])['href']
+                if self.search_params['magnet'] is not None:
+                    magnet = row.select_one(self.search_params['magnet'])['href']
+                else:
+                    magnet = None
                 seeds = row.select_one(self.search_params['seeds']).text
                 leeches = row.select_one(self.search_params['leeches']).text
 
-                torrents.append(Torrent(self, name, size, link, seeds, leeches))
+                if int(seeds) > 0:
+                    torrents.append(Torrent(self, name, size, link, magnet, seeds, leeches))
             except AttributeError:
                 pass
 
