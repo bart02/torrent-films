@@ -59,7 +59,15 @@ class Torrent:
 
         return self._hash
 
+    def __iter__(self):
+        yield ('name', self.name)
+        yield ('size', self.size)
+        yield ('link', self.link)
+        yield ('seeds', self.seeds)
+        yield ('leeches', self.leeches)
 
+    def __str__(self):
+        return str(dict(self))
 
 
 class Torrents(list):
