@@ -62,21 +62,24 @@ class Torrent:
 
 
 
-class Torrents:
-    torrents = []
+class Torrents(list):
+    def __init__(self, seq):
+        super().__init__()
+        self.extend(seq)
 
-    def __init__(self, lst):
-        for e in lst:
-            if type(e) != Torrent:
-                raise Exception('only torrent class')
+    def extend(self, x):
+        for e in x:
             self.append(e)
 
     def append(self, t):
-        if t in self.torrents:
+        if type(t) != Torrent:
+            raise Exception('not torrent object')
+
+        if self.__contains__(t):
             raise Exception('already here')
 
         exists = False
-        for e in self.torrents:
+        for e in self.__iter__():
             if abs(t.size - e.size) < 10485760:
                 if e.hash == t.hash:
                     print('similar', e.link, t.link)
@@ -84,4 +87,4 @@ class Torrents:
                     break
 
         if not exists:
-            self.torrents.append(t)
+            super().append(t)
